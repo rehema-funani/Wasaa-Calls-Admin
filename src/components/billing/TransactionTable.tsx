@@ -1,131 +1,172 @@
 // src/components/billing/TransactionTable.tsx
 import React from 'react';
-import { Table } from '../common/Table';
-import { Badge } from '../common/Badge';
-import { Eye, RefreshCw } from 'lucide-react';
-import { formatCurrency, formatTimeAgo } from '../../utils/helpers';
+import { Button } from '../ui/button';
+import { Eye, MoreHorizontal, Undo, DollarSign, Calendar, CheckCircle, XCircle, Clock, RefreshCw } from 'lucide-react';
+import { formatCurrency } from '../../utils/helpers';
+import { format } from 'date-fns';
 import type { Transaction } from '../../types/billing';
 
 interface TransactionTableProps {
   transactions: Transaction[];
   loading?: boolean;
-  onViewTransaction?: (id: string) => void;
   onProcessRefund?: (id: string) => void;
 }
+
+// Enhanced Status Badge Component
+const StatusBadge = ({ status }: { status: Transaction['status'] }) => {
+  const statusConfig = {
+    Settled: { 
+      color: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+      icon: CheckCircle,
+      dotColor: 'bg-green-500'
+    },
+    Pending: { 
+      color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
+      icon: Clock,
+      dotColor: 'bg-yellow-500'
+    },
+    Failed: { 
+      color: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+      icon: XCircle,
+      dotColor: 'bg-red-500'
+    },
+    Refunded: { 
+      color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+      icon: RefreshCw,
+      dotColor: 'bg-blue-500'
+    }
+  };
+
+  const config = statusConfig[status] || statusConfig.Pending;
+  const IconComponent = config.icon;
+
+  return (
+    <div className="flex items-center gap-2">
+      <div className={`w-2 h-2 rounded-full ${config.dotColor} ${status === 'Pending' ? 'animate-pulse' : ''}`}></div>
+      <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${config.color}`}>
+        <IconComponent size={12} />
+        {status}
+      </span>
+    </div>
+  );
+};
 
 export const TransactionTable: React.FC<TransactionTableProps> = ({
   transactions,
   loading = false,
-  onViewTransaction,
   onProcessRefund
 }) => {
-  const getStatusBadge = (status: Transaction['status']) => {
-    const statusMap = {
-      'Settled': 'success' as const,
-      'Pending': 'warning' as const,
-      'Failed': 'danger' as const,
-      'Refunded': 'neutral' as const
-    };
-    return statusMap[status] || 'neutral';
-  };
-
-  const columns = [
-    {
-      key: 'id' as keyof Transaction,
-      header: 'Transaction',
-      render: (value: string, row: Transaction) => (
-        <div>
-          <div className="text-sm font-medium text-gray-900 dark:text-white">
-            Call {row.callId}
-          </div>
-          <div className="text-sm text-gray-500 dark:text-gray-400">
-            {row.userId} → {row.hostId}
-          </div>
-          <div className="text-xs text-gray-400">
-            ID: {value}
-          </div>
-        </div>
-      )
-    },
-    {
-      key: 'amount' as keyof Transaction,
-      header: 'Amount',
-      render: (value: number, row: Transaction) => (
-        <div>
-          <div className="text-sm font-medium text-gray-900 dark:text-white">
-            {formatCurrency(value, row.currency)}
-          </div>
-          <div className="text-xs text-gray-500 dark:text-gray-400">
-            {row.paymentMethod}
-          </div>
-        </div>
-      )
-    },
-    {
-      key: 'status' as keyof Transaction,
-      header: 'Status',
-      render: (value: Transaction['status'], row: Transaction) => (
-        <div>
-          <Badge variant={getStatusBadge(value)} size="sm">
-            {value}
-          </Badge>
-          {row.blockchain?.verified && (
-            <div className="text-xs text-green-600 dark:text-green-400 mt-1">
-              ✓ Blockchain verified
-            </div>
-          )}
-        </div>
-      )
-    },
-    {
-      key: 'createdAt' as keyof Transaction,
-      header: 'Date',
-      render: (value: string, row: Transaction) => (
-        <div>
-          <div className="text-sm text-gray-900 dark:text-white">
-            {formatTimeAgo(value)}
-          </div>
-          {row.settledAt && (
-            <div className="text-xs text-gray-400">
-              Settled: {formatTimeAgo(row.settledAt)}
-            </div>
-          )}
-        </div>
-      )
-    },
-    {
-      key: 'id' as keyof Transaction,
-      header: 'Actions',
-      className: 'text-right',
-      render: (value: string, row: Transaction) => (
-        <div className="flex items-center justify-end space-x-2">
-          <button
-            onClick={() => onViewTransaction?.(value)}
-            className="p-1.5 text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-colors"
-            title="View Details"
-          >
-            <Eye size={16} />
-          </button>
-          {row.status === 'Pending' && onProcessRefund && (
-            <button
-              onClick={() => onProcessRefund(value)}
-              className="p-1.5 text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/20 rounded-lg transition-colors"
-              title="Process Refund"
-            >
-              <RefreshCw size={16} />
-            </button>
-          )}
-        </div>
-      )
-    }
-  ];
-
   return (
-    <Table
-      data={transactions}
-      columns={columns}
-      loading={loading}
-      emptyMessage="No transactions found"
-    />
+    <div className="overflow-x-auto">
+      <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+        <thead className="bg-gray-50 dark:bg-gray-800/50">
+          <tr>
+            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              Transaction
+            </th>
+            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              Amount
+            </th>
+            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              Status
+            </th>
+            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              Date
+            </th>
+            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              Actions
+            </th>
+          </tr>
+        </thead>
+        <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+          {transactions.map((transaction) => (
+            <tr key={transaction.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+              <td className="px-6 py-4 whitespace-nowrap">
+                <div className="flex flex-col">
+                  <div className="text-sm font-semibold text-gray-900 dark:text-white">
+                    Call {transaction.callId}
+                  </div>
+                  <div className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                    {transaction.userId} → {transaction.hostId}
+                  </div>
+                  <div className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                    ID: {transaction.id}
+                  </div>
+                </div>
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap">
+                <div className="flex items-center gap-2">
+                  <DollarSign size={16} className="text-gray-400" />
+                  <div className="flex flex-col">
+                    <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                      {formatCurrency(transaction.amount)}
+                    </span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                      {transaction.paymentMethod}
+                    </span>
+                  </div>
+                </div>
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap">
+                <StatusBadge status={transaction.status} />
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap">
+                <div className="flex items-center gap-2">
+                  <Calendar size={14} className="text-gray-400" />
+                  <div className="flex flex-col">
+                    <span className="text-sm text-gray-900 dark:text-white">
+                      {format(new Date(transaction.createdAt), 'MMM dd, yyyy')}
+                    </span>
+                    {transaction.settledAt && (
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                        Settled: {format(new Date(transaction.settledAt), 'MMM dd, yyyy')}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap">
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="flex items-center gap-1"
+                  >
+                    <Eye size={14} />
+                    View
+                  </Button>
+                  {transaction.status === 'Failed' && onProcessRefund && (
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => onProcessRefund(transaction.id)}
+                      className="flex items-center gap-1 text-blue-600 hover:text-blue-700"
+                    >
+                      <Undo size={14} />
+                      Refund
+                    </Button>
+                  )}
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="p-2"
+                  >
+                    <MoreHorizontal size={14} />
+                  </Button>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      
+      {transactions.length === 0 && !loading && (
+        <div className="text-center py-16">
+          <DollarSign size={48} className="mx-auto text-gray-400 mb-4" />
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">No transactions found</h3>
+          <p className="text-gray-500 dark:text-gray-400">Try adjusting your search or filters</p>
+        </div>
+      )}
+    </div>
   );
 };

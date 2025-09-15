@@ -1,7 +1,7 @@
+// src/components/dashboard/KPICard.tsx
 import React from 'react';
-import { Card } from '../../components/ui/card';
+import { motion } from 'framer-motion';
 import { cn } from '../../utils/helpers';
-import { ArrowUpRight, ArrowDownRight } from 'lucide-react';
 
 interface KPICardProps {
   title: string;
@@ -11,35 +11,32 @@ interface KPICardProps {
   icon: React.ReactNode;
   gradient: string;
   description: string;
+  className?: string;
 }
 
-export const KPICard: React.FC<KPICardProps> = ({
-  title,
-  value,
-  change,
-  isPositive,
-  icon,
-  gradient,
-  description,
-}) => {
-  return (
-    <Card className={cn('p-6 text-white', gradient)}>
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="text-sm font-medium opacity-80">{title}</p>
-          <p className="text-3xl font-bold mt-1">{value}</p>
-        </div>
-        <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
-          {icon}
-        </div>
+export const KPICard: React.FC<KPICardProps> = ({ title, value, change, isPositive, icon, gradient, description, className }) => (
+  <motion.div
+    className={cn(
+      `relative overflow-hidden rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300`,
+      gradient,
+      className
+    )}
+    whileHover={{ scale: 1.02 }}
+  >
+    <div className="flex items-center justify-between mb-4">
+      <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
+        {icon}
       </div>
-      <div className="flex items-center space-x-2 mt-4 text-sm">
-        <div className={`flex items-center ${isPositive ? 'text-green-300' : 'text-red-300'}`}>
-          {isPositive ? <ArrowUpRight size={16} /> : <ArrowDownRight size={16} />}
-          <span>{change}</span>
-        </div>
-        <span className="opacity-80">{description}</span>
+      <div className={`text-sm font-semibold px-2 py-1 rounded-full ${
+        isPositive ? 'bg-white/20 text-white' : 'bg-red-500/20 text-red-100'
+      }`}>
+        {change}
       </div>
-    </Card>
-  );
-};
+    </div>
+    <div className="space-y-2">
+      <h3 className="text-sm font-medium text-white/80">{title}</h3>
+      <div className="text-3xl font-bold">{value}</div>
+      <p className="text-xs text-white/70">{description}</p>
+    </div>
+  </motion.div>
+);

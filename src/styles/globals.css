@@ -1,6 +1,7 @@
 
 /* ✅ 1. Fonts must be imported first */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 
 /* ✅ 2. Tailwind directives next */
 @import 'tailwindcss';
@@ -63,6 +64,7 @@ body {
   max-width: 100vw;
   overflow-x: hidden;
   font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Poppins', system-ui, sans-serif;
 }
 
 body {
