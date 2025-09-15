@@ -10,7 +10,7 @@ const mockAuditLogs: AuditLog[] = [
 
 export const moderationService = {
   // Get audit logs
-  getAuditLogs: async (filters?: {
+  getAuditLogs: async (_filters?: {
     action?: string;
     userId?: string;
     moderatorId?: string;
