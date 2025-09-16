@@ -1,6 +1,6 @@
 
 // src/api/services/settings.ts
-import { apiClient } from '../axios';
+import api from "../axios";
 
 interface SystemSettings {
   maxCallDuration: number;
@@ -33,12 +33,12 @@ interface SecuritySettings {
 export const settingsService = {
   // System settings
   getSystemSettings: async (): Promise<SystemSettings> => {
-    const response = await apiClient.get('/settings/system');
+    const response = await api.get('/settings/system');
     return response.data;
   },
 
   updateSystemSettings: async (settings: Partial<SystemSettings>): Promise<SystemSettings> => {
-    const response = await apiClient.put('/settings/system', settings);
+    const response = await api.put('/settings/system', settings);
     return response.data;
   },
 
@@ -56,7 +56,7 @@ export const settingsService = {
   },
 
   updateApiSettings: async (settings: Partial<ApiSettings>): Promise<ApiSettings> => {
-    const response = await apiClient.put('/settings/api', settings);
+    const response = await api.put('/settings/api', settings);
     return response.data;
   },
 
@@ -78,24 +78,24 @@ export const settingsService = {
   },
 
   updateSecuritySettings: async (settings: Partial<SecuritySettings>): Promise<SecuritySettings> => {
-    const response = await apiClient.put('/settings/security', settings);
+    const response = await api.put('/settings/security', settings);
     return response.data;
   },
 
   // Webhook management
   testWebhook: async (url: string): Promise<{ success: boolean; response: string; responseTime: number }> => {
-    const response = await apiClient.post('/settings/webhook/test', { url });
+    const response = await api.post('/settings/webhook/test', { url });
     return response.data;
   },
 
   // Feature flags
   getFeatureFlags: async (): Promise<Record<string, boolean>> => {
-    const response = await apiClient.get('/settings/features');
+    const response = await api.get('/settings/features');
     return response.data;
   },
 
   updateFeatureFlags: async (flags: Record<string, boolean>): Promise<Record<string, boolean>> => {
-    const response = await apiClient.put('/settings/features', flags);
+    const response = await api.put('/settings/features', flags);
     return response.data;
   },
 
@@ -107,16 +107,16 @@ export const settingsService = {
     lastSync: string;
     config: Record<string, any>;
   }>> => {
-    const response = await apiClient.get('/settings/integrations');
+    const response = await api.get('/settings/integrations');
     return response.data;
   },
 
   updateIntegration: async (integrationId: string, config: Record<string, any>): Promise<void> => {
-    await apiClient.put(`/settings/integrations/${integrationId}`, config);
+    await api.put(`/settings/integrations/${integrationId}`, config);
   },
 
   testIntegration: async (integrationId: string): Promise<{ success: boolean; message: string }> => {
-    const response = await apiClient.post(`/settings/integrations/${integrationId}/test`);
+    const response = await api.post(`/settings/integrations/${integrationId}/test`);
     return response.data;
   }
 };

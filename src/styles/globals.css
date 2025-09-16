@@ -1,4 +1,4 @@
-
+/* 
 /* ✅ 1. Fonts must be imported first */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
@@ -149,4 +149,4 @@ a {
 
 .animate-slide-in-right {
   animation: slideInRight 0.3s ease-out;
-}
+} 

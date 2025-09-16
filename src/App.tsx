@@ -1,8 +1,10 @@
 import React, { Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { Layout } from './components/layout/Layout';
-import LoginPage from './app/auth/LoginPage';
-import { ProtectedRoute } from './app/auth/ProtectedRoute';
+// import LoginPage from './app/auth/LoginPage';
+import Page from './app/auth/login/page';
+
+// import { ProtectedRoute } from './app/auth/ProtectedRoute';
 // Lazily load the page components
 const Dashboard = React.lazy(() => import('./app/dashboard/Dashboard'));
 const UsersRoles = React.lazy(() => import('./app/users/UsersRoles'));
@@ -21,11 +23,11 @@ const LoadingFallback = () => (
 const AppRoutes = () => {
   return (
     <Routes>
-      <Route path="/auth/login" element={<LoginPage />} />
+      <Route path="/auth/login" element={<Page />} />
       <Route
         path="/*"
         element={
-          <ProtectedRoute>
+          // <ProtectedRoute>
             <Layout>
               <Suspense fallback={<LoadingFallback />}>
                 <Routes>
@@ -41,7 +43,7 @@ const AppRoutes = () => {
                 </Routes>
               </Suspense>
             </Layout>
-          </ProtectedRoute>
+          // </ProtectedRoute>
         }
       />
     </Routes>

@@ -1,6 +1,6 @@
 
 // src/api/index.ts
-export { apiClient as default } from './axios';
+export { api as default } from './axios';
 export * from './services/calls';
 export * from './services/users';
 export * from './services/billing';

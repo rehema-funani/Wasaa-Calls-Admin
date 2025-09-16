@@ -1,5 +1,5 @@
 // src/api/services/moderation.ts
-import { apiClient } from '../axios';
+import api from '../axios';
 import type { AuditLog, ComplianceRequest } from '../../types/moderation';
 
 const mockAuditLogs: AuditLog[] = [
@@ -29,18 +29,18 @@ export const moderationService = {
     page?: number;
     limit?: number;
   }): Promise<{ data: ComplianceRequest[]; total: number }> => {
-    const response = await apiClient.get('/moderation/compliance', { params: filters });
+    const response = await api.get('/moderation/compliance', { params: filters });
     return response.data;
   },
 
   // Process compliance request
   processComplianceRequest: async (requestId: string): Promise<void> => {
-    await apiClient.post(`/moderation/compliance/${requestId}/process`);
+    await api.post(`/moderation/compliance/${requestId}/process`);
   },
 
   // Export user data for GDPR
   exportUserData: async (userId: string): Promise<Blob> => {
-    const response = await apiClient.get(`/moderation/compliance/export/${userId}`, {
+    const response = await api.get(`/moderation/compliance/export/${userId}`, {
       responseType: 'blob'
     });
     return response.data;
@@ -48,6 +48,6 @@ export const moderationService = {
 
   // Delete user data for GDPR
   deleteUserData: async (userId: string): Promise<void> => {
-    await apiClient.delete(`/moderation/compliance/delete/${userId}`);
+    await api.delete(`/moderation/compliance/delete/${userId}`);
   }
 };

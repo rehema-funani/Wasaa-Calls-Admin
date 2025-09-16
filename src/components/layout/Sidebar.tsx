@@ -363,7 +363,9 @@ import {
   Activity,
   Zap
 } from 'lucide-react';
-import { useAuthContext } from '../../context/AuthContext';
+// import { useAuthContext } from '../../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
+
 import { cn } from '../../utils/helpers';
 
 const sidebarItems = [
@@ -510,7 +512,7 @@ interface SidebarProps {
 
 export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false, onToggle }) => {
   const location = useLocation();
-  const { user, logout } = useAuthContext();
+  const { user, logout } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
 
   const isActivePath = (path: string) => {

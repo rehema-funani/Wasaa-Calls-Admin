@@ -1,11 +1,11 @@
 // src/api/services/reports.ts
-import { apiClient } from '../axios';
+import api from '../axios';
 import type { CallAnalytics, RevenueAnalytics, RegionalStat } from '../../types/reports';
 
 export const reportsService = {
   // Get call analytics
   getCallAnalytics: async (timeframe: '24h' | '7d' | '30d' | '90d' = '24h'): Promise<CallAnalytics> => {
-    const response = await apiClient.get('/reports/calls', { params: { timeframe } });
+    const response = await api.get('/reports/calls', { params: { timeframe } });
     return response.data;
   },
 
@@ -35,7 +35,7 @@ export const reportsService = {
     callType?: string;
     region?: string;
   }): Promise<any> => {
-    const response = await apiClient.get('/reports/qos', { params: filters });
+    const response = await api.get('/reports/qos', { params: filters });
     return response.data;
   },
 
@@ -45,7 +45,7 @@ export const reportsService = {
     userType?: string;
     region?: string;
   }): Promise<any> => {
-    const response = await apiClient.get('/reports/user-activity', { params: filters });
+    const response = await api.get('/reports/user-activity', { params: filters });
     return response.data;
   },
 
@@ -55,13 +55,13 @@ export const reportsService = {
     currency?: string;
     transactionType?: string;
   }): Promise<any> => {
-    const response = await apiClient.get('/reports/financial', { params: filters });
+    const response = await api.get('/reports/financial', { params: filters });
     return response.data;
   },
 
   // Export reports
   exportReport: async (reportType: string, format: 'csv' | 'pdf' | 'xlsx', filters?: any): Promise<Blob> => {
-    const response = await apiClient.get(`/reports/export/${reportType}`, {
+    const response = await api.get(`/reports/export/${reportType}`, {
       params: { format, ...filters },
       responseType: 'blob'
     });
@@ -75,7 +75,7 @@ export const reportsService = {
     errorRate: number;
     activeConnections: number;
   }> => {
-    const response = await apiClient.get('/reports/system-metrics');
+    const response = await api.get('/reports/system-metrics');
     return response.data;
   },
 

@@ -1,7 +1,7 @@
 
 // src/hooks/useUsers.ts
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { usersService } from '../api/services/users';
+import { userService } from '../api';
 import { toast } from 'react-hot-toast';
 import type { User } from '../types';
 
@@ -21,7 +21,7 @@ export const useUsers = (options: UseUsersOptions = {}) => {
     error
   } = useQuery({
     queryKey: ['users', options],
-    queryFn: () => usersService.getUsers({
+    queryFn: () => userService.getUsers({
       ...options,
       limit: 50
     }),
@@ -30,7 +30,7 @@ export const useUsers = (options: UseUsersOptions = {}) => {
   // Update user role
   const updateRoleMutation = useMutation({
     mutationFn: ({ userId, role }: { userId: string; role: User['role'] }) =>
-      usersService.updateUserRole(userId, role),
+      userService.updateUserRole(userId, role),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
       toast.success('User role updated successfully');
@@ -43,7 +43,7 @@ export const useUsers = (options: UseUsersOptions = {}) => {
   // Suspend user
   const suspendUserMutation = useMutation({
     mutationFn: ({ userId, reason }: { userId: string; reason?: string }) =>
-      usersService.suspendUser(userId, reason || 'Admin action'),
+      userService.suspendUser(userId, reason || 'Admin action'),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
       toast.success('User suspended successfully');
@@ -56,7 +56,7 @@ export const useUsers = (options: UseUsersOptions = {}) => {
   // Add user
   const addUserMutation = useMutation({
     mutationFn: (userData: Omit<User, 'id' | 'createdAt' | 'lastSeen' | 'activeCalls' | 'status'>) =>
-      usersService.addUser(userData),
+      userService.addUser(userData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
       toast.success('User added successfully');

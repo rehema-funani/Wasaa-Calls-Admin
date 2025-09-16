@@ -26,7 +26,7 @@ import { KPICard } from '../../components/dashboard/KPICard';
 import { Card } from '../../components/common/Card';
 import { Badge } from '../../components/common/Badge';
 import { callsService } from '../../api/services/calls';
-import { usersService } from '../../api/services/users';
+import { userService } from '../../api';
 import { billingService } from '../../api/services/billing';
 import { reportsService } from '../../api/services/reports';
 import { formatCurrency, formatTimeAgo } from '../../utils/helpers';
@@ -95,7 +95,7 @@ const Dashboard: React.FC = () => {
       // Fetch all dashboard data in parallel
       const [callsData, usersData, billingData, revenueAnalytics, regionData, activityData] = await Promise.all([
         callsService.getAnalytics('24h'),
-        usersService.getUsers({ limit: 5 }),
+        userService.getUsers({ limit: 5 }),
         billingService.getEscrowOverview(),
         reportsService.getRevenueAnalytics('30d'),
         reportsService.getRegionalStats(),
